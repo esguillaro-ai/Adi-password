@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRIPTO-LLAVES SEGURAS — ADI</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #00ff88;
+    --green-dim: #00aa55;
+    --green-dark: #003322;
+    --amber: #ffb300;
+    --amber-dim: #cc8800;
+    --red: #ff3333;
+    --bg: #080e0b;
+    --bg2: #0d1710;
+    --bg3: #111d14;
+    --border: #1a3020;
+    --text: #8fbfa0;
+    --text-dim: #3d6b4a;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,255,136,0.018) 2px,
+      rgba(0,255,136,0.018) 4px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .scanline {
+    position: fixed;
+    top: -20%;
+    left: 0;
+    width: 100%;
+    height: 20%;
+    background: linear-gradient(to bottom, transparent, rgba(0,255,136,0.035) 50%, transparent);
+    animation: scan 7s linear infinite;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  @keyframes scan {
+    0% { top: -20%; }
+    100% { top: 120%; }
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--green-dark);
+    border: 1px solid var(--green-dim);
+    color: var(--green-dim);
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    padding: 4px 14px;
+    margin-bottom: 1rem;
+    animation: blink-border 3s ease-in-out infinite;
+  }
+
+  @keyframes blink-border {
+    0%, 100% { border-color: var(--green-dim); }
+    50% { border-color: var(--amber-dim); }
+  }
+
+  .title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(18px, 4vw, 28px);
+    font-weight: 900;
+    color: var(--green);
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(0,255,136,0.3);
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 4px;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  .mission-label {
+    font-size: 10px;
+    color: var(--amber-dim);
+    letter-spacing: 2px;
+    margin-top: 0.5rem;
+  }
+
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 1.2rem;
+    position: relative;
+  }
+
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--green-dim);
+    opacity: 0.5;
+  }
+
+  .panel-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    margin-bottom: 1.2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.6rem;
+  }
+
+  .password-display {
+    background: var(--bg);
+    border: 1px solid var(--green-dim);
+    border-left: 3px solid var(--green);
+    padding: 1.2rem 1rem;
+    margin-bottom: 1rem;
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .password-display::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 70%, rgba(0,255,136,0.04));
+    pointer-events: none;
+  }
+
+  #password-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(13px, 2.5vw, 16px);
+    color: var(--green);
+    word-break: break-all;
+    flex: 1;
+    letter-spacing: 1px;
+    line-height: 1.5;
+    text-shadow: 0 0 8px rgba(0,255,136,0.4);
+    transition: none;
+    min-height: 24px;
+  }
+
+  #password-text.scrambling {
+    color: var(--amber);
+    text-shadow: 0 0 8px rgba(255,179,0,0.5);
+  }
+
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--green-dim);
+    color: var(--green-dim);
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .copy-btn:hover {
+    background: var(--green-dark);
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .copy-btn.copied {
+    border-color: var(--amber);
+    color: var(--amber);
+  }
+
+  .strength-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.8rem;
+  }
+
+  .strength-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    min-width: 90px;
+  }
+
+  .strength-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.4s ease, background 0.4s ease;
+    position: relative;
+  }
+
+  .strength-bar::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0;
+    width: 6px; height: 100%;
+    background: rgba(255,255,255,0.3);
+    animation: bar-pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes bar-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  .strength-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    min-width: 80px;
+    text-align: right;
+  }
+
+  .option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .option-row:last-child { border-bottom: none; }
+
+  .option-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .option-name .tag {
+    font-size: 9px;
+    font-family: 'Share Tech Mono', monospace;
+    background: var(--green-dark);
+    color: var(--green-dim);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    letter-spacing: 1px;
+  }
+
+  .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 130px;
+    height: 4px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    background: var(--green);
+    border: 2px solid var(--bg);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(0,255,136,0.5);
+  }
+
+  input[type=range]::-moz-range-thumb {
+    width: 14px; height: 14px;
+    background: var(--green);
+    border: 2px solid var(--bg);
+    cursor: pointer;
+    border-radius: 0;
+  }
+
+  .slider-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    color: var(--green);
+    min-width: 28px;
+    text-align: center;
+  }
+
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .toggle {
+    position: relative;
+    width: 36px;
+    height: 18px;
+  }
+
+  .toggle input { display: none; }
+
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    cursor: pointer;
+    transition: background 0.2s;
+    border: 1px solid var(--text-dim);
+  }
+
+  .toggle-thumb {
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 12px; height: 12px;
+    background: var(--text-dim);
+    transition: transform 0.2s, background 0.2s;
+    pointer-events: none;
+  }
+
+  .toggle input:checked + .toggle-track {
+    background: var(--green-dark);
+    border-color: var(--green-dim);
+  }
+
+  .toggle input:checked ~ .toggle-thumb {
+    transform: translateX(18px);
+    background: var(--green);
+    box-shadow: 0 0 6px rgba(0,255,136,0.6);
+  }
+
+  .toggle-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  .generate-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+  }
+
+  .generate-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0,255,136,0.1), transparent);
+    transition: left 0.4s;
+  }
+
+  .generate-btn:hover::before { left: 100%; }
+
+  .generate-btn:hover {
+    background: var(--green-dark);
+    box-shadow: 0 0 20px rgba(0,255,136,0.2);
+  }
+
+  .generate-btn:active {
+    transform: scale(0.99);
+  }
+
+  .generate-btn.loading {
+    color: var(--amber);
+    border-color: var(--amber);
+    pointer-events: none;
+  }
+
+  .footer-info {
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+
+  .footer-info p {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+
+  .classified-stamp {
+    display: inline-block;
+    border: 2px solid var(--amber-dim);
+    color: var(--amber-dim);
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    padding: 3px 10px;
+    opacity: 0.4;
+    transform: rotate(-2deg);
+    margin-top: 1rem;
+  }
+
+  .tips {
+    background: rgba(0,255,136,0.03);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--amber-dim);
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .tips-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    color: var(--amber-dim);
+    letter-spacing: 3px;
+    margin-bottom: 0.7rem;
+  }
+
+  .tips ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .tips li {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    padding: 3px 0;
+    padding-left: 12px;
+    position: relative;
+  }
+
+  .tips li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--amber-dim);
+  }
+
+  @keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.6; }
+    97% { opacity: 1; }
+    98% { opacity: 0.7; }
+  }
+
+  .title { animation: flicker 8s infinite; }
+
+  .counter {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    text-align: right;
+    padding-top: 4px;
+  }
+
+  .mode-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 1.4rem;
+    border: 1px solid var(--border);
+  }
+
+  .mode-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 10px 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .mode-tab:last-child { border-right: none; }
+
+  .mode-tab:hover {
+    background: var(--green-dark);
+    color: var(--green-dim);
+  }
+
+  .mode-tab.active {
+    background: var(--green-dark);
+    color: var(--green);
+    border-bottom: 2px solid var(--green);
+  }
+
+  .mode-section { display: none; }
+  .mode-section.active { display: block; }
+
+  .input-field-wrap {
+    background: var(--bg);
+    border: 1px solid var(--green-dim);
+    border-left: 3px solid var(--green);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .input-field-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 70%, rgba(0,255,136,0.04));
+    pointer-events: none;
+  }
+
+  #manual-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(13px, 2.5vw, 16px);
+    color: var(--green);
+    letter-spacing: 2px;
+    padding: 1.1rem 0;
+    flex: 1;
+    width: 100%;
+    caret-color: var(--green);
+    text-shadow: 0 0 8px rgba(0,255,136,0.4);
+  }
+
+  #manual-input::placeholder {
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    font-size: 12px;
+    text-shadow: none;
+  }
+
+  #manual-input[type=password] { letter-spacing: 4px; }
+
+  .eye-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px;
+    transition: color 0.2s;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .eye-btn:hover { color: var(--green); }
+
+  .checklist {
+    margin-top: 0.8rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    transition: color 0.3s;
+  }
+
+  .check-item .dot {
+    width: 8px; height: 8px;
+    border: 1px solid var(--text-dim);
+    flex-shrink: 0;
+    transition: background 0.3s, border-color 0.3s;
+  }
+
+  .check-item.ok { color: var(--green-dim); }
+  .check-item.ok .dot {
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 0 4px rgba(0,255,136,0.6);
+  }
+
+  .check-item.warn { color: #ff6600; }
+  .check-item.warn .dot { background: #ff6600; border-color: #ff6600; }
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<div class="container">
+  <div class="header">
+    <div class="badge">MISIÓN 4 — OPERACIÓN RED</div>
+    <h1 class="title">CRIPTO-LLAVES<br>SEGURAS</h1>
+    <p class="subtitle">Agencia Digital de Inteligencia</p>
+    <p class="mission-label">// GENERADOR DE CONTRASEÑAS DE AGENTE //</p>
+  </div>
+
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="tab-manual" onclick="switchMode('manual')">⌨ ANALIZAR MI CLAVE</button>
+    <button class="mode-tab" id="tab-gen" onclick="switchMode('gen')">⬡ GENERAR</button>
+  </div>
+
+  <!-- MODO GENERADOR -->
+  <div class="mode-section" id="section-gen">
+
+    <div class="panel">
+      <div class="panel-label">▌ CRIPTO-LLAVE GENERADA</div>
+      <div class="password-display">
+        <span id="password-text">_ _ _ _ _ _ _ _ _ _ _ _</span>
+        <button class="copy-btn" id="copy-btn" onclick="copyPassword()">EXTRAER</button>
+      </div>
+      <div class="strength-section">
+        <span class="strength-label">FORTALEZA:</span>
+        <div class="strength-bar-wrap">
+          <div class="strength-bar" id="strength-bar"></div>
+        </div>
+        <span class="strength-text" id="strength-text" style="color:var(--text-dim)">— SIN CLAVE —</span>
+      </div>
+      <div class="counter" id="entropy-label"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">▌ PARÁMETROS DE CIFRADO</div>
+      <div class="option-row">
+        <span class="option-name">LONGITUD <span class="tag">PARAM</span></span>
+        <div class="slider-wrap">
+          <input type="range" id="length" min="8" max="32" value="16"
+                 oninput="document.getElementById('len-val').textContent=this.value; updatePreview()">
+          <span class="slider-val" id="len-val">16</span>
+        </div>
+      </div>
+      <div class="option-row">
+        <span class="option-name">MAYÚSCULAS <span class="tag">A-Z</span></span>
+        <div class="toggle-wrap">
+          <label class="toggle">
+            <input type="checkbox" id="opt-upper" checked onchange="updatePreview()">
+            <span class="toggle-track"></span><span class="toggle-thumb"></span>
+          </label>
+          <span class="toggle-label">ACTIVO</span>
+        </div>
+      </div>
+      <div class="option-row">
+        <span class="option-name">MINÚSCULAS <span class="tag">a-z</span></span>
+        <div class="toggle-wrap">
+          <label class="toggle">
+            <input type="checkbox" id="opt-lower" checked onchange="updatePreview()">
+            <span class="toggle-track"></span><span class="toggle-thumb"></span>
+          </label>
+          <span class="toggle-label">ACTIVO</span>
+        </div>
+      </div>
+      <div class="option-row">
+        <span class="option-name">NÚMEROS <span class="tag">0-9</span></span>
+        <div class="toggle-wrap">
+          <label class="toggle">
+            <input type="checkbox" id="opt-nums" checked onchange="updatePreview()">
+            <span class="toggle-track"></span><span class="toggle-thumb"></span>
+          </label>
+          <span class="toggle-label">ACTIVO</span>
+        </div>
+      </div>
+      <div class="option-row">
+        <span class="option-name">SÍMBOLOS <span class="tag">!@#</span></span>
+        <div class="toggle-wrap">
+          <label class="toggle">
+            <input type="checkbox" id="opt-syms" checked onchange="updatePreview()">
+            <span class="toggle-track"></span><span class="toggle-thumb"></span>
+          </label>
+          <span class="toggle-label">ACTIVO</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tips">
+      <div class="tips-title">▌ PROTOCOLO DE AGENTE — REGLAS DE CAMPO</div>
+      <ul>
+        <li>Combinar SIEMPRE mayúsculas, números y símbolos</li>
+        <li>Nunca usar tu nombre, fecha de nacimiento ni "1234"</li>
+        <li>Cada cuenta requiere una cripto-llave distinta</li>
+        <li>No compartir contraseñas — ni con el Jefe de Agentes</li>
+      </ul>
+    </div>
+
+    <button class="generate-btn" id="gen-btn" onclick="generate()">
+      ⬡ GENERAR NUEVA CRIPTO-LLAVE ⬡
+    </button>
+
+  </div>
+
+  <!-- MODO ANALIZAR -->
+  <div class="mode-section active" id="section-manual">
+
+    <div class="panel">
+      <div class="panel-label">▌ INGRESA TU CRIPTO-LLAVE</div>
+      <div class="input-field-wrap">
+        <input type="password" id="manual-input" placeholder="Escribe tu contraseña aquí..."
+               oninput="analyzeManual()" autocomplete="new-password" spellcheck="false">
+        <button class="eye-btn" id="eye-btn" onclick="toggleVisibility()" title="Mostrar/ocultar">👁</button>
+      </div>
+      <div class="strength-section">
+        <span class="strength-label">FORTALEZA:</span>
+        <div class="strength-bar-wrap">
+          <div class="strength-bar" id="m-strength-bar"></div>
+        </div>
+        <span class="strength-text" id="m-strength-text" style="color:var(--text-dim)">— SIN CLAVE —</span>
+      </div>
+      <div class="counter" id="m-entropy-label"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">▌ ANÁLISIS DE COMPONENTES</div>
+      <div class="checklist">
+        <div class="check-item" id="chk-len"><span class="dot"></span> 8+ caracteres</div>
+        <div class="check-item" id="chk-upper"><span class="dot"></span> Mayúsculas (A-Z)</div>
+        <div class="check-item" id="chk-lower"><span class="dot"></span> Minúsculas (a-z)</div>
+        <div class="check-item" id="chk-nums"><span class="dot"></span> Números (0-9)</div>
+        <div class="check-item" id="chk-syms"><span class="dot"></span> Símbolos (!@#…)</div>
+        <div class="check-item" id="chk-long"><span class="dot"></span> 12+ caracteres</div>
+        <div class="check-item" id="chk-noseq"><span class="dot"></span> Sin secuencias</div>
+        <div class="check-item" id="chk-nodict"><span class="dot"></span> Sin palabras simples</div>
+      </div>
+    </div>
+
+    <div class="tips">
+      <div class="tips-title">▌ PROTOCOLO DE AGENTE — REGLAS DE CAMPO</div>
+      <ul>
+        <li>Combinar SIEMPRE mayúsculas, números y símbolos</li>
+        <li>Nunca usar tu nombre, fecha de nacimiento ni "1234"</li>
+        <li>Cada cuenta requiere una cripto-llave distinta</li>
+        <li>No compartir contraseñas — ni con el Jefe de Agentes</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer-info">
+    <p>ADI — OPERACIÓN RED / HABILIDADES DIGITALES / CEIBAL</p>
+    <div class="classified-stamp">CLASIFICADO</div>
+  </div>
+</div>
+
+<script>
+const CHARS = {
+  upper: 'ABCDEFGHJKLMNPQRSTUVWXYZ',
+  lower: 'abcdefghjkmnpqrstuvwxyz',
+  nums:  '23456789',
+  syms:  '!@#$%&*?+-=^'
+};
+
+const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*?+-=^░▒▓█▄▀◆◇';
+
+let currentPassword = '';
+let scrambleInterval = null;
+
+function getCharset() {
+  let c = '';
+  if (document.getElementById('opt-upper').checked) c += CHARS.upper;
+  if (document.getElementById('opt-lower').checked) c += CHARS.lower;
+  if (document.getElementById('opt-nums').checked)  c += CHARS.nums;
+  if (document.getElementById('opt-syms').checked)  c += CHARS.syms;
+  return c || CHARS.lower + CHARS.nums;
+}
+
+function buildPassword(len) {
+  const charset = getCharset();
+  const arr = new Uint32Array(len);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(n => charset[n % charset.length]).join('');
+}
+
+function calcEntropy(password) {
+  let pool = 0;
+  if (/[A-Z]/.test(password)) pool += 26;
+  if (/[a-z]/.test(password)) pool += 26;
+  if (/[0-9]/.test(password)) pool += 10;
+  if (/[^A-Za-z0-9]/.test(password)) pool += 32;
+  return pool > 0 ? Math.round(password.length * Math.log2(pool)) : 0;
+}
+
+function updateStrength(password) {
+  const bar = document.getElementById('strength-bar');
+  const txt = document.getElementById('strength-text');
+  const lbl = document.getElementById('entropy-label');
+
+  if (!password || password.includes('_')) {
+    bar.style.width = '0%';
+    bar.style.background = 'var(--text-dim)';
+    txt.textContent = '— SIN CLAVE —';
+    txt.style.color = 'var(--text-dim)';
+    lbl.textContent = '';
+    return;
+  }
+
+  const entropy = calcEntropy(password);
+  lbl.textContent = `ENTROPÍA: ~${entropy} bits`;
+
+  let pct, label, color;
+  if (entropy < 30)      { pct=15;  label='NIVEL 0 — CRÍTICO';    color='var(--red)'; }
+  else if (entropy < 50) { pct=35;  label='NIVEL 1 — DÉBIL';      color='#ff6600'; }
+  else if (entropy < 70) { pct=55;  label='NIVEL 2 — MODERADO';   color='var(--amber)'; }
+  else if (entropy < 90) { pct=75;  label='NIVEL 3 — FUERTE';     color='var(--green-dim)'; }
+  else                   { pct=100; label='NIVEL 4 — INVIOLABLE';  color='var(--green)'; }
+
+  bar.style.width = pct + '%';
+  bar.style.background = color;
+  txt.textContent = label;
+  txt.style.color = color;
+}
+
+function scrambleAnimate(finalPassword, duration) {
+  const el = document.getElementById('password-text');
+  const frames = Math.floor(duration / 40);
+  let frame = 0;
+  el.classList.add('scrambling');
+
+  if (scrambleInterval) clearInterval(scrambleInterval);
+  scrambleInterval = setInterval(() => {
+    const progress = frame / frames;
+    const revealed = Math.floor(progress * finalPassword.length);
+    let display = finalPassword.slice(0, revealed);
+    for (let i = revealed; i < finalPassword.length; i++) {
+      display += SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+    }
+    el.textContent = display;
+    frame++;
+    if (frame > frames) {
+      clearInterval(scrambleInterval);
+      el.textContent = finalPassword;
+      el.classList.remove('scrambling');
+      currentPassword = finalPassword;
+      updateStrength(finalPassword);
+    }
+  }, 40);
+}
+
+function generate() {
+  const len = parseInt(document.getElementById('length').value);
+  const password = buildPassword(len);
+  const btn = document.getElementById('gen-btn');
+
+  btn.classList.add('loading');
+  btn.textContent = '⬡ CIFRANDO... ⬡';
+
+  document.getElementById('entropy-label').textContent = '';
+  updateStrength('');
+
+  scrambleAnimate(password, 900);
+
+  setTimeout(() => {
+    btn.classList.remove('loading');
+    btn.textContent = '⬡ GENERAR NUEVA CRIPTO-LLAVE ⬡';
+  }, 950);
+}
+
+function updatePreview() {
+  if (currentPassword) {
+    const len = parseInt(document.getElementById('length').value);
+    if (currentPassword.length !== len) {
+      currentPassword = '';
+      document.getElementById('password-text').textContent = '_ _ _ _ _ _ _ _ _ _ _ _';
+      updateStrength('');
+    }
+  }
+}
+
+function copyPassword() {
+  if (!currentPassword) return;
+  const btn = document.getElementById('copy-btn');
+  navigator.clipboard.writeText(currentPassword).then(() => {
+    btn.textContent = '✔ EXTRAÍDO';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'EXTRAER';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+function switchMode(mode) {
+  document.getElementById('section-gen').classList.toggle('active', mode === 'gen');
+  document.getElementById('section-manual').classList.toggle('active', mode === 'manual');
+  document.getElementById('tab-gen').classList.toggle('active', mode === 'gen');
+  document.getElementById('tab-manual').classList.toggle('active', mode === 'manual');
+  if (mode === 'manual') document.getElementById('manual-input').focus();
+}
+
+function toggleVisibility() {
+  const inp = document.getElementById('manual-input');
+  const btn = document.getElementById('eye-btn');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.textContent = '🔒';
+  } else {
+    inp.type = 'password';
+    btn.textContent = '👁';
+  }
+}
+
+const DICT = ['password','contraseña','123456','qwerty','admin','ceibal','agente','uruguay','hola','casa','perro','gato'];
+const SEQ = ['1234','abcd','qwer','asdf','0000','1111','2222','3333','aaaa','bbbb'];
+
+function analyzeManual() {
+  const pw = document.getElementById('manual-input').value;
+  const bar = document.getElementById('m-strength-bar');
+  const txt = document.getElementById('m-strength-text');
+  const lbl = document.getElementById('m-entropy-label');
+
+  const checks = {
+    len:    pw.length >= 8,
+    upper:  /[A-Z]/.test(pw),
+    lower:  /[a-z]/.test(pw),
+    nums:   /[0-9]/.test(pw),
+    syms:   /[^A-Za-z0-9]/.test(pw),
+    long:   pw.length >= 12,
+    noseq:  !SEQ.some(s => pw.toLowerCase().includes(s)),
+    nodict: !DICT.some(d => pw.toLowerCase().includes(d))
+  };
+
+  Object.entries(checks).forEach(([k, v]) => {
+    const el = document.getElementById('chk-' + k);
+    if (!el) return;
+    el.classList.toggle('ok', v);
+    el.classList.toggle('warn', !v && pw.length > 0);
+  });
+
+  if (!pw) {
+    bar.style.width = '0%';
+    bar.style.background = 'var(--text-dim)';
+    txt.textContent = '— SIN CLAVE —';
+    txt.style.color = 'var(--text-dim)';
+    lbl.textContent = '';
+    return;
+  }
+
+  const entropy = calcEntropy(pw);
+  lbl.textContent = `ENTROPÍA: ~${entropy} bits`;
+
+  let pct, label, color;
+  if (entropy < 30)      { pct=15;  label='NIVEL 0 — CRÍTICO';    color='var(--red)'; }
+  else if (entropy < 50) { pct=35;  label='NIVEL 1 — DÉBIL';      color='#ff6600'; }
+  else if (entropy < 70) { pct=55;  label='NIVEL 2 — MODERADO';   color='var(--amber)'; }
+  else if (entropy < 90) { pct=75;  label='NIVEL 3 — FUERTE';     color='var(--green-dim)'; }
+  else                   { pct=100; label='NIVEL 4 — INVIOLABLE';  color='var(--green)'; }
+
+  bar.style.width = pct + '%';
+  bar.style.background = color;
+  txt.textContent = label;
+  txt.style.color = color;
+}
+
+generate();
+</script>
+</body>
+</html>
